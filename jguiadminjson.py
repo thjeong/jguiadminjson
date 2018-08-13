@@ -5,7 +5,7 @@ import json, os, datetime
 app = Flask(__name__)
 homeUrl = '/'
 homeRepo = 'mct'
-CHAR_SET = 'utf-8'
+REPO_CHAR_SET = 'utf-8'
 BASE_DIR = '/Users/a80099707/PycharmProjects/jguiadminjson/repo'
 DEPLOY_CHAR_SET = 'euckr'
 DEPLOY_DIR = '/Users/a80099707/PycharmProjects/jguiadminjson/repo'
@@ -16,8 +16,8 @@ def index():
 
 @app.route(homeUrl + 'json/<reponame>/<filename>/<version>')
 def data_json(reponame, filename, version):
-    # with open('/repo/' + reponame + '/' + filename + '.json') as f:
-    with app.open_resource('repo/' + reponame + '/' + filename + '.' + version + '.json') as f:
+    repo_filename = os.path.join(BASE_DIR, reponame, filename + '.' + version + '.json')
+    with open(repo_filename, 'r', encoding=REPO_CHAR_SET) as f:
         data = json.load(f)
     return json.dumps(data).encode('utf-8')
 
@@ -28,10 +28,10 @@ def save_json(reponame, filename):
     version = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
     repo_filename = os.path.join(BASE_DIR, reponame, filename + '.' + version + '.json')
     deploy_filename = os.path.join(DEPLOY_DIR, filename + '.json')
-    with open(repo_filename, "w", encoding=CHAR_SET) as f:
-        f.write(str(data))
-    with open(deploy_filename, "w", encoding=DEPLOY_CHAR_SET) as f:
-        f.write(str(data))
+    with open(repo_filename, "wb") as f:
+        f.write(data.encode(REPO_CHAR_SET))
+    with open(deploy_filename, "wb") as f:
+        f.write(data.encode(DEPLOY_CHAR_SET))
     return jsonify(version=version)
 
 
